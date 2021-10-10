@@ -48,6 +48,9 @@
 #include <thread>
 #include <type_traits>
 
+// own
+#include "Utility/raymath.h"
+
 // Windows
 #ifdef _WIN32
 	#ifndef UNICODE
