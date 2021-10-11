@@ -8,7 +8,7 @@ class Light;
 
 class Scene
 {
-private:
+public:
 	std::vector<Camera*> cameras;
 	std::vector<Object*> objects;
 	std::vector<Light*> lights;
