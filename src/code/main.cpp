@@ -52,7 +52,7 @@ int main()
 				window.close();
 		}
 		//-- process
-		scene.cameras[0]->yaw += PI / 600;
+		scene.cameraRotateYaw(0, PI / 600);
 		scene.calculateCameraImage(0);
 		renderTexture.loadFromImage(scene.getCameraImage(0));
 

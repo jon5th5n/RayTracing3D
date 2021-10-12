@@ -44,3 +44,30 @@ uint8_t* Scene::getCameraImageBuffer(unsigned int nr)
 {
 	return cameras[nr]->getImageBuffer();
 }
+
+//---
+
+void Scene::cameraMove(unsigned int nr, float xamount, float yamount, float zamount)
+{
+	cameras[nr]->position = Vector3Add(cameras[nr]->position, Vector3 { xamount, yamount, zamount });
+}
+
+void Scene::cameraMoveToDirection(unsigned int nr, float amount)
+{}
+
+void Scene::cameraMovePerpendicularToDirection(unsigned int nr, float amount)
+{}
+
+void Scene::cameraRotateYaw(unsigned int nr, float amount)
+{
+	cameras[nr]->yaw += amount;
+	if (cameras[nr]->yaw > PI * 2)
+		cameras[nr]->yaw -= PI * 2;
+}
+
+void Scene::cameraRotatePitch(unsigned int nr, float amount)
+{
+	cameras[nr]->pitch += amount;
+	if (cameras[nr]->pitch > PI * 2)
+		cameras[nr]->pitch -= PI * 2;
+}
