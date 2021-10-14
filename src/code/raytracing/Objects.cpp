@@ -25,6 +25,8 @@ std::tuple<bool, Vector3, Object*> Sphere::getRayIntersection(Ray* ray)
 	float d1 = -Vector3DotProduct(u, Vector3Subtract(o, c)) + sqrtf(del);
 	float d2 = -Vector3DotProduct(u, Vector3Subtract(o, c)) - sqrtf(del);
 
+	if (d1 < 0 && d2 < 0) // Object is behind the Ray
+		return std::tuple<bool, Vector3, Object*> { false, Vector3Zero(), this };
 	if (d1 == d2 || d1 < d2)
 		return std::tuple<bool, Vector3, Object*> { true, Vector3Add(ray->origin, Vector3Scale(ray->direction, d1)), this };
 	// if (d2 < d1) is the only remaining option

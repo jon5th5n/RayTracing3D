@@ -21,6 +21,8 @@ int main()
 	window.create(sf::VideoMode(900.0f * screenScalingFactor, 600.0f * screenScalingFactor), "ray tracer");
 	platform.setIcon(window.getSystemHandle());
 
+	window.setFramerateLimit(60);
+
 	sf::Event event;
 
 	sf::Font mainFont;
@@ -42,7 +44,8 @@ int main()
 	Scene scene;
 	scene.addObject(new Sphere(50, -15, -10, 15, sf::Color::Red));
 	scene.addObject(new Sphere(100, 15, 20, 15, sf::Color::Green));
-	scene.addCamera(new Camera(0, 0, 0, 900, 600, 1.5));
+	scene.addObject(new Sphere(-100, 15, 20, 15, sf::Color::Blue));
+	scene.addCamera(new Camera(0, 0, 0, 90, 60, 1.5));
 
 	while (window.isOpen())
 	{
@@ -52,7 +55,7 @@ int main()
 				window.close();
 		}
 		//-- process
-		scene.cameraRotateYaw(0, PI / 600);
+		scene.cameraRotateYaw(0, PI / 120);
 		scene.calculateCameraImage(0);
 		renderTexture.loadFromImage(scene.getCameraImage(0));
 
