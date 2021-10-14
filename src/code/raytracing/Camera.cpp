@@ -57,8 +57,8 @@ void Camera::calculateImageBuffer(std::vector<Object*> objects)
 	{
 		for (unsigned int j = 0; j < imageHeight; j++)
 		{
-			Vector3 rayDir = Vector3RotateYaw(rays[i][j].direction, yaw);
-			rayDir = Vector3RotatePitch(rayDir, pitch);
+			Vector3 rayDir = Vector3RotatePitch(rays[i][j].direction, pitch);
+			rayDir = Vector3RotateYaw(rayDir, yaw);
 			Ray ray(position.x, position.y, position.z, rayDir);
 
 			sf::Color c = ray.getColor(objects);

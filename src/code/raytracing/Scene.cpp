@@ -53,10 +53,22 @@ void Scene::cameraMove(unsigned int nr, float xamount, float yamount, float zamo
 }
 
 void Scene::cameraMoveToDirection(unsigned int nr, float amount)
-{}
+{
+	Vector3 direction = NewVector3(1, 0, 0);
+	direction = Vector3RotateYaw(direction, cameras[nr]->yaw);
+	direction = Vector3RotatePitch(direction, cameras[nr]->pitch);
+
+	cameras[nr]->position = Vector3Add(cameras[nr]->position, Vector3Scale(direction, amount));
+}
 
 void Scene::cameraMovePerpendicularToDirection(unsigned int nr, float amount)
-{}
+{
+	Vector3 direction = NewVector3(1, 0, 0);
+	direction = Vector3RotateYaw(direction, cameras[nr]->yaw + PI / 2);
+	direction = Vector3RotatePitch(direction, cameras[nr]->pitch);
+
+	cameras[nr]->position = Vector3Add(cameras[nr]->position, Vector3Scale(direction, amount));
+}
 
 void Scene::cameraRotateYaw(unsigned int nr, float amount)
 {
@@ -68,6 +80,14 @@ void Scene::cameraRotateYaw(unsigned int nr, float amount)
 void Scene::cameraRotatePitch(unsigned int nr, float amount)
 {
 	cameras[nr]->pitch += amount;
-	if (cameras[nr]->pitch > PI * 2)
-		cameras[nr]->pitch -= PI * 2;
+	if (cameras[nr]->pitch > PI / 2)
+		cameras[nr]->pitch = PI / 2;
+	if (cameras[nr]->pitch < -PI / 2)
+		cameras[nr]->pitch = -PI / 2;
+}
+
+std::tuple<float, float, float, float, float> Scene::cameraGetPositionAndRotation(unsigned int nr)
+{
+	Camera* camera = cameras[nr];
+	return std::tuple<float, float, float, float, float> { camera->position.x, camera->position.y, camera->position.z, camera->yaw, camera->pitch };
 }

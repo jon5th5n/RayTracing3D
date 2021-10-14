@@ -9,6 +9,9 @@
 #include "raytracing/Ray.hpp"
 #include "raytracing/Scene.hpp"
 
+float random(float min, float max);
+void handleInput(Scene* scene);
+
 int main()
 {
 	util::Platform platform;
@@ -18,7 +21,7 @@ int main()
 	sf::RenderWindow window;
 	float screenScalingFactor = platform.getScreenScalingFactor(window.getSystemHandle());
 
-	window.create(sf::VideoMode(900.0f * screenScalingFactor, 600.0f * screenScalingFactor), "ray tracer");
+	window.create(sf::VideoMode(450.0f * screenScalingFactor, 300.0f * screenScalingFactor), "ray tracer");
 	platform.setIcon(window.getSystemHandle());
 
 	window.setFramerateLimit(60);
@@ -33,6 +36,10 @@ int main()
 	sf::Time previousTime = clock.getElapsedTime();
 	sf::Time currentTime;
 	sf::Text fpsCounter(std::to_string((int)fps), mainFont, 20);
+	fpsCounter.setPosition(2, 0);
+
+	sf::Text positionDisplay("", mainFont, 10);
+	positionDisplay.setPosition(2, 25);
 
 	sf::Image image;
 	image.create(900, 600, sf::Color::Magenta);
@@ -42,10 +49,9 @@ int main()
 	renderSprite.setTexture(renderTexture);
 
 	Scene scene;
-	scene.addObject(new Sphere(50, -15, -10, 15, sf::Color::Red));
-	scene.addObject(new Sphere(100, 15, 20, 15, sf::Color::Green));
-	scene.addObject(new Sphere(-100, 15, 20, 15, sf::Color::Blue));
-	scene.addCamera(new Camera(0, 0, 0, 90, 60, 1.5));
+	for (int i = 0; i < 20; i++)
+		scene.addObject(new Sphere(random(-200, 200), random(-200, 200), random(-50, 50), random(5, 50), sf::Color(random(0, 255), random(0, 255), random(0, 255))));
+	scene.addCamera(new Camera(0, 0, 0, 450, 300, 1.5));
 
 	while (window.isOpen())
 	{
@@ -55,7 +61,8 @@ int main()
 				window.close();
 		}
 		//-- process
-		scene.cameraRotateYaw(0, PI / 120);
+		handleInput(&scene);
+
 		scene.calculateCameraImage(0);
 		renderTexture.loadFromImage(scene.getCameraImage(0));
 
@@ -65,6 +72,7 @@ int main()
 		window.draw(renderSprite);
 
 		window.draw(fpsCounter);
+		window.draw(positionDisplay);
 
 		window.display();
 		//-----
@@ -73,7 +81,69 @@ int main()
 		fps = 1.0f / (currentTime.asSeconds() - previousTime.asSeconds());
 		previousTime = currentTime;
 		fpsCounter.setString(std::to_string((int)fps));
+
+		auto [cpx, cpy, cpz, cry, crp] = scene.cameraGetPositionAndRotation(0);
+		positionDisplay.setString(std::to_string((int)cpx) + ", " + std::to_string((int)cpy) + ", " + std::to_string((int)cpz) + "\n" + std::to_string((int)(cry * RAD2DEG)) + ", " + std::to_string((int)(crp * RAD2DEG)));
 	}
 
 	return 0;
+}
+
+//=====
+
+float random(float min, float max)
+{
+	return (min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min))));
+}
+
+//---
+
+void handleInput(Scene* scene)
+{
+	float movementSpeed = 1;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl))
+		movementSpeed = 2;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+	{
+		scene->cameraMoveToDirection(0, movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+	{
+		scene->cameraMoveToDirection(0, -movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+	{
+		scene->cameraMovePerpendicularToDirection(0, -movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+	{
+		scene->cameraMovePerpendicularToDirection(0, movementSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		scene->cameraMove(0, 0, 0, -movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	{
+		scene->cameraMove(0, 0, 0, movementSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
+		scene->cameraRotateYaw(0, -1.5 * DEG2RAD * movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	{
+		scene->cameraRotateYaw(0, 1.5 * DEG2RAD * movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	{
+		scene->cameraRotatePitch(0, -1 * DEG2RAD * movementSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		scene->cameraRotatePitch(0, 1 * DEG2RAD * movementSpeed);
+	}
 }

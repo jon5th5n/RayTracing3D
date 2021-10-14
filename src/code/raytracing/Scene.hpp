@@ -29,4 +29,6 @@ public:
 	void cameraMovePerpendicularToDirection(unsigned int nr, float amount);
 	void cameraRotateYaw(unsigned int nr, float amount);
 	void cameraRotatePitch(unsigned int nr, float amount);
+
+	std::tuple<float, float, float, float, float> cameraGetPositionAndRotation(unsigned int nr);
 };
