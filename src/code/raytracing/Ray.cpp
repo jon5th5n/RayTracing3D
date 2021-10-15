@@ -1,4 +1,5 @@
 #include "Ray.hpp"
+#include "Light.hpp"
 #include "Objects.hpp"
 
 //=======
@@ -49,7 +50,7 @@ std::tuple<bool, Vector3, Object*> Ray::getNearestIntersection(std::vector<Objec
 	return std::tuple<bool, Vector3, Object*> { (nearestIntersectionDistance != std::numeric_limits<float>::infinity()), nearestIntersection, nearestObject };
 }
 
-sf::Color Ray::getColor(Object* object)
+sf::Color Ray::getColor(Object* object, Light* light)
 {
 	auto [isIntersecting, intersection, objectPtr] = object->getRayIntersection(this);
 
@@ -58,11 +59,28 @@ sf::Color Ray::getColor(Object* object)
 	return sf::Color::Black;
 }
 
-sf::Color Ray::getColor(std::vector<Object*> objects)
+sf::Color Ray::getColor(std::vector<Object*> objects, std::vector<Light*> lights)
 {
 	auto [isIntersecting, intersection, objectPtr] = getNearestIntersection(objects);
+	if (!isIntersecting)
+		return sf::Color::Black;
 
-	if (isIntersecting)
-		return objectPtr->color;
-	return sf::Color::Black;
+	sf::Color color = objectPtr->color;
+
+	Vector3 intersectionNormalVec = Vector3Normalize(Vector3Negate(Vector3Subtract(objectPtr->position, intersection)));
+	Vector3 intersectionToLightDirVec = Vector3Normalize(Vector3Subtract(lights[0]->position, intersection));
+
+	Ray intersectionToLightRay(intersection.x + intersectionNormalVec.x, intersection.y + intersectionNormalVec.y, intersection.z + intersectionNormalVec.z, intersectionToLightDirVec);
+	if (std::get<0>(intersectionToLightRay.getNearestIntersection(objects)))
+		return sf::Color::Black;
+
+	float angleBetweenNormalAndLight = abs(Vector3AngleBetween(intersectionNormalVec, intersectionToLightDirVec));
+	float brightness = Remap(angleBetweenNormalAndLight, 0, PI / 2, 1, 0);
+	if (brightness < 0)
+		brightness = 0;
+	color.r *= brightness;
+	color.g *= brightness;
+	color.b *= brightness;
+
+	return color;
 }

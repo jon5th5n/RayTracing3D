@@ -1,6 +1,7 @@
 #pragma once
 
 class Object;
+class Light;
 
 //=======
 
@@ -18,8 +19,8 @@ public:
 	std::pair<bool, Vector3> getIntersection(Object* object);
 	std::pair<bool, Vector3> getIntersection(std::vector<Object*> objects);
 	std::tuple<bool, Vector3, Object*> getNearestIntersection(std::vector<Object*> objects);
-	virtual sf::Color getColor(Object* object);
-	virtual sf::Color getColor(std::vector<Object*> objects);
+	virtual sf::Color getColor(Object* object, Light* light);
+	virtual sf::Color getColor(std::vector<Object*> objects, std::vector<Light*> lights);
 };
 
 //-------

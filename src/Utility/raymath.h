@@ -560,6 +560,13 @@ RMDEF float Vector3DotProduct(Vector3 v1, Vector3 v2)
 	return result;
 }
 
+// Calculate two vectors dot product
+RMDEF float Vector3AngleBetween(Vector3 v1, Vector3 v2)
+{
+	float result = acos(Vector3DotProduct(v1, v2) / (Vector3Length(v1) * Vector3Length(v2)));
+	return result;
+}
+
 // Calculate distance between two vectors
 RMDEF float Vector3Distance(Vector3 v1, Vector3 v2)
 {

@@ -27,9 +27,9 @@ private:
 	uint8_t* imageBuffer;
 
 public:
-	void calculateImageBuffer(Object* object);
-	void calculateImageBuffer(std::vector<Object*> objects);
-	void clearImageBuffer(sf::Color c = sf::Color::White);
+	void calculateImageBuffer(Object* object, Light* light);
+	void calculateImageBuffer(std::vector<Object*> objects, std::vector<Light*> lights);
+	void clearImageBuffer();
 
 	uint8_t* getImageBuffer();
 	sf::Image getImage();

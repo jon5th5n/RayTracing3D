@@ -30,7 +30,7 @@ Camera::Camera(float x, float y, float z, unsigned int iw, unsigned int ih, floa
 	imageBuffer = new uint8_t[imageWidth * imageHeight * 4];
 }
 
-void Camera::calculateImageBuffer(Object* object)
+void Camera::calculateImageBuffer(Object* object, Light* light)
 {
 	for (unsigned int i = 0; i < imageWidth; i++)
 	{
@@ -40,7 +40,7 @@ void Camera::calculateImageBuffer(Object* object)
 			rayDir = Vector3RotatePitch(rayDir, pitch);
 			Ray ray(position.x, position.y, position.z, rayDir);
 
-			sf::Color c = ray.getColor(object);
+			sf::Color c = ray.getColor(object, light);
 
 			unsigned int index = (i + (j * imageWidth)) * 4;
 			imageBuffer[index + 0] = c.r;
@@ -51,7 +51,7 @@ void Camera::calculateImageBuffer(Object* object)
 	}
 }
 
-void Camera::calculateImageBuffer(std::vector<Object*> objects)
+void Camera::calculateImageBuffer(std::vector<Object*> objects, std::vector<Light*> lights)
 {
 	for (unsigned int i = 0; i < imageWidth; i++)
 	{
@@ -61,7 +61,7 @@ void Camera::calculateImageBuffer(std::vector<Object*> objects)
 			rayDir = Vector3RotateYaw(rayDir, yaw);
 			Ray ray(position.x, position.y, position.z, rayDir);
 
-			sf::Color c = ray.getColor(objects);
+			sf::Color c = ray.getColor(objects, lights);
 
 			unsigned int index = (i + (j * imageWidth)) * 4;
 			imageBuffer[index + 0] = c.r;
@@ -72,7 +72,7 @@ void Camera::calculateImageBuffer(std::vector<Object*> objects)
 	}
 }
 
-void Camera::clearImageBuffer(sf::Color c)
+void Camera::clearImageBuffer()
 {
 	for (unsigned int i = 0; i < imageWidth * imageHeight * 4; i++)
 		imageBuffer[i] = 255;

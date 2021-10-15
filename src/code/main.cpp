@@ -51,6 +51,7 @@ int main()
 	Scene scene;
 	for (int i = 0; i < 20; i++)
 		scene.addObject(new Sphere(random(-200, 200), random(-200, 200), random(-50, 50), random(5, 50), sf::Color(random(0, 255), random(0, 255), random(0, 255))));
+	scene.addLight(new Light(0, 0, -100));
 	scene.addCamera(new Camera(0, 0, 0, 450, 300, 1.5));
 
 	while (window.isOpen())

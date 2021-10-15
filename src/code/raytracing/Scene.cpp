@@ -23,7 +23,7 @@ void Scene::addLight(Light* light)
 void Scene::calculateCameraImage(unsigned int nr)
 {
 	cameras[nr]->clearImageBuffer();
-	cameras[nr]->calculateImageBuffer(objects);
+	cameras[nr]->calculateImageBuffer(objects, lights);
 }
 
 void Scene::calculateCameraImages()
@@ -31,7 +31,7 @@ void Scene::calculateCameraImages()
 	for (Camera* camera : cameras)
 	{
 		camera->clearImageBuffer();
-		camera->calculateImageBuffer(objects);
+		camera->calculateImageBuffer(objects, lights);
 	}
 }
 
