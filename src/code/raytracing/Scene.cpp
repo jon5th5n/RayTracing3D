@@ -45,6 +45,16 @@ uint8_t* Scene::getCameraImageBuffer(unsigned int nr)
 	return cameras[nr]->getImageBuffer();
 }
 
+float Scene::cameraGetScale(unsigned int nr)
+{
+	return cameras[nr]->getScale();
+}
+
+void Scene::cameraSetScale(unsigned int nr, float scale)
+{
+	cameras[nr]->setScale(scale);
+}
+
 //---
 
 void Scene::cameraMove(unsigned int nr, float xamount, float yamount, float zamount)

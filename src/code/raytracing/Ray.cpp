@@ -4,12 +4,6 @@
 
 //=======
 
-// Ray::Ray()
-// {
-// 	origin = Vector3Zero();
-// 	direction = Vector2Zero();
-// }
-
 Ray::Ray(float x, float y, float z, Vector3 dir)
 {
 	origin = NewVector3(x, y, z);
@@ -68,19 +62,27 @@ sf::Color Ray::getColor(std::vector<Object*> objects, std::vector<Light*> lights
 	sf::Color color = objectPtr->color;
 
 	Vector3 intersectionNormalVec = Vector3Normalize(Vector3Negate(Vector3Subtract(objectPtr->position, intersection)));
-	Vector3 intersectionToLightDirVec = Vector3Normalize(Vector3Subtract(lights[0]->position, intersection));
 
-	Ray intersectionToLightRay(intersection.x + intersectionNormalVec.x, intersection.y + intersectionNormalVec.y, intersection.z + intersectionNormalVec.z, intersectionToLightDirVec);
-	if (std::get<0>(intersectionToLightRay.getNearestIntersection(objects)))
+	std::vector<Light*> unintersectedLights;
+	for (Light* light : lights)
+	{
+		Vector3 intersectionToLightDirVec = Vector3Normalize(Vector3Subtract(light->position, intersection));
+		Ray intersectionToLightRay(intersection.x + intersectionNormalVec.x * 0.1, intersection.y + intersectionNormalVec.y * 0.1, intersection.z + intersectionNormalVec.z * 0.1, intersectionToLightDirVec);
+		if (!std::get<0>(intersectionToLightRay.getNearestIntersection(objects)))
+			unintersectedLights.push_back(light);
+	}
+	if (unintersectedLights.size() == 0)
 		return sf::Color::Black;
 
-	float angleBetweenNormalAndLight = abs(Vector3AngleBetween(intersectionNormalVec, intersectionToLightDirVec));
-	float brightness = Remap(angleBetweenNormalAndLight, 0, PI / 2, 1, 0);
-	if (brightness < 0)
-		brightness = 0;
-	color.r *= brightness;
-	color.g *= brightness;
-	color.b *= brightness;
+	float brightness = 0;
+	for (Light* light : unintersectedLights)
+	{
+		Vector3 intersectionToLightDirVec = Vector3Normalize(Vector3Subtract(light->position, intersection));
+		float angleBetweenNormalAndLight = abs(Vector3AngleBetween(intersectionNormalVec, intersectionToLightDirVec));
+		brightness += Clamp(Remap(angleBetweenNormalAndLight, 0, PI / 2, 1, 0), 0, 1) * light->brightness;
+	}
+
+	color = ColorMultiply(color, brightness);
 
 	return color;
 }

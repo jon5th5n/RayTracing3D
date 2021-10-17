@@ -1,6 +1,3 @@
-
-// TODO: Add Lights and Camera movement through user input
-
 #include "Platform/Platform.hpp"
 
 #include "raytracing/Camera.hpp"
@@ -21,7 +18,7 @@ int main()
 	sf::RenderWindow window;
 	float screenScalingFactor = platform.getScreenScalingFactor(window.getSystemHandle());
 
-	window.create(sf::VideoMode(450.0f * screenScalingFactor, 300.0f * screenScalingFactor), "ray tracer");
+	window.create(sf::VideoMode(sf::VideoMode::getDesktopMode().width * screenScalingFactor, sf::VideoMode::getDesktopMode().height * screenScalingFactor), "ray tracer");
 	platform.setIcon(window.getSystemHandle());
 
 	window.setFramerateLimit(60);
@@ -38,11 +35,13 @@ int main()
 	sf::Text fpsCounter(std::to_string((int)fps), mainFont, 20);
 	fpsCounter.setPosition(2, 0);
 
+	sf::Text scaleDisplay("", mainFont, 15);
+	scaleDisplay.setPosition(2, 25);
 	sf::Text positionDisplay("", mainFont, 10);
-	positionDisplay.setPosition(2, 25);
+	positionDisplay.setPosition(2, 40);
 
 	sf::Image image;
-	image.create(900, 600, sf::Color::Magenta);
+	image.create(window.getSize().x, window.getSize().y, sf::Color::Magenta);
 	sf::Texture renderTexture;
 	renderTexture.loadFromImage(image);
 	sf::Sprite renderSprite;
@@ -51,8 +50,9 @@ int main()
 	Scene scene;
 	for (int i = 0; i < 20; i++)
 		scene.addObject(new Sphere(random(-200, 200), random(-200, 200), random(-50, 50), random(5, 50), sf::Color(random(0, 255), random(0, 255), random(0, 255))));
-	scene.addLight(new Light(0, 0, -100));
-	scene.addCamera(new Camera(0, 0, 0, 450, 300, 1.5));
+	for (int i = 0; i < 2; i++)
+		scene.addLight(new Light(random(-350, 350), random(-350, 350), random(-350, 350), 1));
+	scene.addCamera(new Camera(0, 0, 0, window.getSize().x, window.getSize().y, 0.2, 1.5));
 
 	while (window.isOpen())
 	{
@@ -66,6 +66,7 @@ int main()
 
 		scene.calculateCameraImage(0);
 		renderTexture.loadFromImage(scene.getCameraImage(0));
+		renderSprite.setScale(pow(scene.cameraGetScale(0), -1), pow(scene.cameraGetScale(0), -1));
 
 		//-- draw
 		window.clear();
@@ -73,6 +74,7 @@ int main()
 		window.draw(renderSprite);
 
 		window.draw(fpsCounter);
+		window.draw(scaleDisplay);
 		window.draw(positionDisplay);
 
 		window.display();
@@ -83,6 +85,7 @@ int main()
 		previousTime = currentTime;
 		fpsCounter.setString(std::to_string((int)fps));
 
+		scaleDisplay.setString(std::to_string((int)(scene.cameraGetScale(0) * 100)) + "%");
 		auto [cpx, cpy, cpz, cry, crp] = scene.cameraGetPositionAndRotation(0);
 		positionDisplay.setString(std::to_string((int)cpx) + ", " + std::to_string((int)cpy) + ", " + std::to_string((int)cpz) + "\n" + std::to_string((int)(cry * RAD2DEG)) + ", " + std::to_string((int)(crp * RAD2DEG)));
 	}
@@ -146,5 +149,24 @@ void handleInput(Scene* scene)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		scene->cameraRotatePitch(0, 1 * DEG2RAD * movementSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+	{
+		float currentScale = scene->cameraGetScale(0);
+		scene->cameraSetScale(0, currentScale += 0.01);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
+	{
+		float currentScale = scene->cameraGetScale(0);
+		scene->cameraSetScale(0, currentScale -= 0.01);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0))
+	{
+		scene->cameraSetScale(0, 1);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1))
+	{
+		scene->cameraSetScale(0, 0.2);
 	}
 }

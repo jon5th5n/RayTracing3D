@@ -4,30 +4,17 @@
 
 //=======
 
-Camera::Camera(float x, float y, float z, unsigned int iw, unsigned int ih, float _fov)
+Camera::Camera(float x, float y, float z, unsigned int iw, unsigned int ih, float _scale, float _fov)
 {
 	position = NewVector3(x, y, z);
 	yaw = 0;
 	pitch = 0;
-	imageWidth = iw;
-	imageHeight = ih;
+	originalImageWidth = iw;
+	originalImageHeight = ih;
 	fov = _fov;
 
-	for (unsigned int i = 0; i < imageWidth; i++)
-	{
-		std::vector<Ray> a;
-		rays.push_back(a);
-		for (unsigned int j = 0; j < imageHeight; j++)
-		{
-			float ir = Remap(i, 0, imageWidth, -0.5, 0.5);
-			float jr = Remap(j, 0, imageHeight, (-0.5 / imageWidth) * imageHeight, (0.5 / imageWidth) * imageHeight);
-
-			Ray ray = Ray(position.x, position.y, position.z, NewVector3(1 / fov, ir, jr));
-			rays[i].push_back(ray);
-		}
-	}
-
-	imageBuffer = new uint8_t[imageWidth * imageHeight * 4];
+	imageBuffer = new uint8_t[1];
+	setScale(_scale);
 }
 
 void Camera::calculateImageBuffer(Object* object, Light* light)
@@ -88,4 +75,40 @@ sf::Image Camera::getImage()
 	sf::Image img;
 	img.create(imageWidth, imageHeight, imageBuffer);
 	return img;
+}
+
+float Camera::getScale()
+{
+	return scale;
+}
+
+void Camera::setScale(float _scale)
+{
+	if (_scale < 0.01)
+		scale = 0.01;
+	else if (_scale > 1)
+		scale = 1;
+	else
+		scale = _scale;
+
+	imageWidth = (uint)(originalImageWidth * scale);
+	imageHeight = (uint)(originalImageHeight * scale);
+
+	rays.clear();
+	for (unsigned int i = 0; i < imageWidth; i++)
+	{
+		std::vector<Ray> a;
+		rays.push_back(a);
+		for (unsigned int j = 0; j < imageHeight; j++)
+		{
+			float ir = Remap(i, 0, imageWidth, -0.5, 0.5);
+			float jr = Remap(j, 0, imageHeight, (-0.5 / imageWidth) * imageHeight, (0.5 / imageWidth) * imageHeight);
+
+			Ray ray = Ray(position.x, position.y, position.z, NewVector3(1 / fov, ir, jr));
+			rays[i].push_back(ray);
+		}
+	}
+
+	delete[] imageBuffer;
+	imageBuffer = new uint8_t[imageWidth * imageHeight * 4];
 }

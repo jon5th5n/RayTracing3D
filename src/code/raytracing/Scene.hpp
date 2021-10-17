@@ -8,7 +8,7 @@ class Light;
 
 class Scene
 {
-private:
+public:
 	std::vector<Camera*> cameras;
 	std::vector<Object*> objects;
 	std::vector<Light*> lights;
@@ -23,6 +23,9 @@ public:
 
 	sf::Image getCameraImage(unsigned int nr);
 	uint8_t* getCameraImageBuffer(unsigned int nr);
+
+	float cameraGetScale(unsigned int nr);
+	void cameraSetScale(unsigned int nr, float scale);
 
 	void cameraMove(unsigned int nr, float xamount, float yamount, float zamount);
 	void cameraMoveToDirection(unsigned int nr, float amount);

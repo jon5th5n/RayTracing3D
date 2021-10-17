@@ -5,8 +5,10 @@
 class Light
 {
 public:
-	Light(float x, float y, float z);
+	Light(float x, float y, float z, float brightness);
 
 public:
 	Vector3 position;
+
+	float brightness;
 };

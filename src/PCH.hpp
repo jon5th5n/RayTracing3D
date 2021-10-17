@@ -49,6 +49,7 @@
 #include <type_traits>
 
 // own
+#include "Utility/colormath.hpp"
 #include "Utility/raymath.h"
 
 // Windows
